@@ -1,0 +1,21 @@
+# Maintainer: Christoph Gysin <christoph.gysin@gmail.com>
+_pkgname=xmm7360-usb-modeswitch-master
+pkgname=xmm7360-usb-modeswitch
+pkgver=1
+pkgrel=1
+pkgdesc='Tools for the Fibocom L850-GL / Intel XMM7360 LTE modem'
+arch=('x86_64')
+url="https://github.com/xmm7360/xmm7360-usb-modeswitch"
+license=('None')
+depends=("acpi_call" "mkinitcpio")
+options+=('!debug')
+makedepends=("linux")
+source=("https://github.com/xmm7360/xmm7360-usb-modeswitch/archive/refs/heads/master.zip")
+sha256sums=('253660ddae6d44a8dd657fb82eeae22eba7aaf27c11eb81f956e193d917dfd5d')
+
+package() {
+  cd $_pkgname
+  install -Dm755 xmm2usb "$pkgdir"/usr/bin/$pkgname
+}
+
+# vim:set ts=2 sw=2 et:

@@ -1,0 +1,13 @@
+[Unit]
+Description=Shadowsocks-Rust Manager Service
+After=network.target
+
+[Service]
+Type=simple
+User=ss
+#Environment=RUST_BACKTRACE=full #For dedug
+ExecStart=/usr/bin/ssmanager-rust -c /etc/shadowsocks/%i.cfg --log-without-time
+
+[Install]
+WantedBy=multi-user.target
+

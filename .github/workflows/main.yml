@@ -1,0 +1,130 @@
+name: CI
+on:
+  workflow_dispatch:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 */3 * * *'
+
+jobs:
+  prepare:
+   name: Prepare ubuntu
+   runs-on: ubuntu-latest
+   steps:
+      - name: Maximize disk space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 5120
+          remove-dotnet: true
+          remove-android: true
+          remove-docker-images: true
+  build_arch:
+    name: Arch
+    needs: [prepare]
+    runs-on: ubuntu-latest
+
+    container:
+      image: archlinux
+      options: --privileged
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install packages
+        run: |
+          pacman -Syyu base base-devel ca-certificates-utils ca-certificates bubblewrap-suid sudo bash git ccache gcc go python-pip curl wget glycin glycin-gtk4 man man-db unzip mc openssh zip htop pacutils pacman-contrib strace bind axel zsh vim namcap debugedit binutils findutils --needed --noconfirm
+
+      - name: Prepare Arch Linux container
+        run: |
+          sudo rm -r /etc/pacman.d/gnupg/ && sudo pacman-key --init && sudo pacman-key --populate archlinux
+          curl -4s "https://build.opensuse.org/projects/home:you-oops-dev/signing_keys/download?kind=gpg" > /tmp/home_you-oops-dev_key.gpg && sudo pacman-key --add /tmp/home_you-oops-dev_key.gpg && sudo pacman-key --finger 8f390f892aeafe7d && sudo pacman-key --lsign-key 8f390f892aeafe7d
+          sudo useradd -m -g users -G log,systemd-journal,wheel,power,daemon -s /bin/bash build_pkg_container
+          echo -e "temp_user\ntemp_user" | sudo passwd build_pkg_container
+          echo "build_pkg_container ALL=(ALL) NOPASSWD:ALL" | sudo tee -ia /etc/sudoers
+
+      - name: Enable ccache
+        uses: hendrikmuhs/ccache-action@v1.2.19
+        with:
+          create-symlink: true
+
+      - name: Show statistic ccache 1
+        run: |
+          sudo ln -s /__w/you-oops-dev.github.io/you-oops-dev.github.io/.ccache /home/build_pkg_container/.ccache
+          sudo chown -R build_pkg_container:users /__w/you-oops-dev.github.io/you-oops-dev.github.io/.ccache/ && sudo ls -la /home/build_pkg_container/.ccache/
+          ccache -vs
+
+      - name: Prepare Build Package
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+        run: |
+          sudo mkdir -p /home/build_pkg_container/build/
+          sudo cp -f .makepkg.conf /home/build_pkg_container/build/
+          sudo cp -f .makepkg.conf /etc/makepkg.conf
+          sudo cp -f .pacman.conf /etc/pacman.conf
+          sudo pacman -Syy --noconfirm &>/dev/null
+          sudo chown build_pkg_container:users /home/build_pkg_container/build/.makepkg.conf
+          sudo chown root:root /etc/makepkg.conf /etc/pacman.conf
+          cp -rf ./*/ /home/build_pkg_container/build/
+          cd /home/build_pkg_container/
+          sudo chown -R build_pkg_container:users /home/build_pkg_container/
+          cd /home/build_pkg_container/build/
+          sudo -u build_pkg_container git clone https://aur.archlinux.org/yay.git
+          cd yay
+          sudo -u build_pkg_container makepkg --config /home/build_pkg_container/build/.makepkg.conf -scCrfi --skippgpcheck --noconfirm && cd ../
+          sudo rm -rf ../yay/ ../go/
+
+      - name: Install deps for compile
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+        run: |
+           sudo pacman -U /home/build_pkg_container/build/deps_build/*.pkg.tar.zst --noconfirm --overwrite=/*
+           sudo rm -fr /home/build_pkg_container/build/deps_build/ /home/build_pkg_container/build/README.md /home/build_pkg_container/build/.gitignore /home/build_pkg_container/build/artifact/ /home/build_pkg_container/build/you-oops-dev-repo/
+
+      - name: Compile,install deps with yay AUR
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+        run: |
+           cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy shntool --noconfirm --aur
+
+      - name: Show directory for view compile package
+        run: |
+           ls -lahs --color=auto /home/build_pkg_container/build/
+
+      - name: Build Package
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+        run: |
+          cd /home/build_pkg_container/build/ && for d in *; do (echo -e "\e[1;34m->\033[0m \e[1;37mEntry into the directory ${d}...\033[0m" && cd "$d"/ && sudo -u build_pkg_container makepkg --config /home/build_pkg_container/build/.makepkg.conf -scCrf --skippgpcheck --noconfirm && echo -e "\e[1;34m->\033[0m \e[1;37mThe package has been assembled ${d}...\033[0m" && sudo rm -rf ./*.tar.gz ./*.gz ./*.tar.zst ./*.patch ./*.diff ./*.zst ./*.zip ./*.deb ./*.rpm ./*.AppImage ./*.appImage ./*.pkg.tar.xz ./*.tar.zip ./*.tgz ./*.tar.bz2 ./*.tar.gz ./*.bz2 ./*.rar ./*.tar ./*.tbz2 ./pkg/ ./src/ ./*.snap ./*.img ./*.tar.xz ../go/ ../.cargo/ ../.cache/go* /tmp/* && sudo pacman -Sc --noconfirm &>/dev/null); done
+
+      - name: Show statistic ccache 2
+        run: |
+          ccache -vs
+
+      - name: Move packages directory artifact and repos dir
+        run: |
+           export HOME_GITHUB=$(pwd)
+           mkdir -pv ${HOME_GITHUB}/artifact/
+           find /home/build_pkg_container/.cache/yay/ -type f -name "*.pkg.tar.zst" -exec sudo cp -fv {} ${HOME_GITHUB}/artifact/ \
+           find /home/build_pkg_container/build/ -type f -name "*.pkg.tar.zst" -exec sudo cp -fv {} ${HOME_GITHUB}/artifact/ \
+           find /home/build_pkg_container/.cache/yay/ -type f -name "*.pkg.tar.xz" -exec sudo cp -fv {} ${HOME_GITHUB}/artifact/ \
+           find /home/build_pkg_container/build/ -type f -name "*.pkg.tar.xz" -exec sudo cp -fv {} ${HOME_GITHUB}/artifact/ \
+           sudo rm -rfv /home/build_pkg_container/build/ /home/build_pkg_container/.cache/yay/
+
+      - name: Generate repo database
+        run: |
+          repo-add --prevent-downgrade ./artifact/you-oops-dev-repo.db.tar.gz $(find ./artifact/ -type f \( -name '*.pkg.tar.zst' -o -name '*.pkg.tar.xz' \))
+          rm -f ./artifact/*.old
+
+      - name: Create/Update GitHub Release
+        uses: ncipollo/release-action@v1.20.0
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: artifact/*
+          bodyFile: README.md
+          commit: main
+          makeLatest: stable
+          name: stable
+          tag: stable
+          token: ${{ secrets.ACCESS_TOKEN }}

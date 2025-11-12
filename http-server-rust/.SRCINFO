@@ -1,0 +1,19 @@
+pkgbase = simple-http-server
+	pkgdesc = Simple http server in Rust
+	pkgver = 0.6.13
+	pkgrel = 1
+	url = https://github.com/TheWaWaR/simple-http-server
+	arch = i686
+	arch = x86_64
+	arch = armv7h
+	arch = aarch64
+	license = MIT
+	makedepends = rust
+	options = !debug
+	options = !lto
+	source = simple-http-server-0.6.13.tar.gz::https://wget.la/https://github.com/TheWaWaR/simple-http-server/archive/refs/tags/v0.6.13.tar.gz
+	source = vendor.tar.gz
+	sha384sums = f6e54ab9a8aa276277c53b7623a964da81c7526cd14922cec8058cc3af79e774398bfbffc74098416745dc38f8ad485c
+	sha384sums = 375115a21c9dd3b7b714749408c5f3ba5c45306589cdfa7b0efd236c881de1b461185b3c3d011bccae69f38413d67c1c
+
+pkgname = simple-http-server

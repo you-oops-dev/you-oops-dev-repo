@@ -1,0 +1,18 @@
+--- src/amneziawg-tools/src/systemd/wg-quick@.service	2024-03-04 17:11:37.350993593 +0300
++++ wg-quick@.service	2024-03-04 17:13:46.466204554 +0300
+@@ -1,14 +1,8 @@
+ [Unit]
+-Description=WireGuard via wg-quick(8) for %I
++Description=WireGuard via awg-quick(8) for %I
+ After=network-online.target nss-lookup.target
+ Wants=network-online.target nss-lookup.target
+ PartOf=awg-quick.target
+-Documentation=man:awg-quick(8)
+-Documentation=man:awg(8)
+-Documentation=https://www.wireguard.com/
+-Documentation=https://www.wireguard.com/quickstart/
+-Documentation=https://git.zx2c4.com/wireguard-tools/about/src/man/wg-quick.8
+-Documentation=https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
+ 
+ [Service]
+ Type=oneshot

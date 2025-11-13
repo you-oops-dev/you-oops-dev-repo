@@ -88,7 +88,8 @@ jobs:
           PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
           SHELL: /bin/bash
         run: |
-           cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy shntool --noconfirm --aur
+           cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy shntool cmake3-bin --noconfirm --aur
+           rm -rf /home/build_pkg_container/.cache/yay/
 
       - name: Show directory for view compile package
         run: |

@@ -22,7 +22,7 @@ sha256sums=('SKIP'
             'SKIP'
             'SKIP'
             'SKIP'
-	        'SKIP')
+	          'SKIP')
 
 prepare() {
     local src
@@ -38,7 +38,7 @@ prepare() {
 build() {
   cd ${srcdir}/${pkgname}
 
-	make -j$(nproc) -C src/ \
+	make -s -j$(nproc) -C src/ \
     DESTDIR="${pkgdir}/" \
     WITH_BASHCOMPLETION=yes \
                 WITH_WGQUICK=yes \

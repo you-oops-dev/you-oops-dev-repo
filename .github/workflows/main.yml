@@ -33,7 +33,7 @@ jobs:
 
       - name: Install packages
         run: |
-          pacman -Syyu base base-devel ca-certificates-utils ca-certificates bubblewrap-suid sudo bash git ccache gcc go python-pip curl wget glycin glycin-gtk4 man man-db unzip mc openssh zip htop pacutils pacman-contrib strace bind axel zsh vim namcap debugedit binutils findutils --needed --noconfirm
+          pacman -Syyu base base-devel ca-certificates-utils ca-certificates bubblewrap-suid sudo bash git ccache gcc go python-pip curl wget glycin glycin-gtk4 man man-db unzip mc openssh zip htop pacutils pacman-contrib strace bind axel zsh vim namcap debugedit binutils findutils linux linux-headers kmod --needed --noconfirm
 
       - name: Prepare Arch Linux container
         run: |
@@ -41,7 +41,7 @@ jobs:
           echo -e "temp_user\ntemp_user" | sudo passwd build_pkg_container
           echo "build_pkg_container ALL=(ALL) NOPASSWD:ALL" | sudo tee -ia /etc/sudoers
 
-      - name: Enable ccache
+      - name: Ccache
         uses: hendrikmuhs/ccache-action@v1.2.19
         with:
           create-symlink: true

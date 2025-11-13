@@ -6,8 +6,8 @@ This is more of a learning experience/fun project for me, but if you find any of
 Using your text editor of choice, modify `/etc/pacman.conf`. For example: `sudo nano /etc/pacman.conf`. Scroll down to the bottom and append the following lines:
 ```
 [you-oops-dev-repo]
-SigLevel = Optional DatabaseOptional
-Server = https://github.com/you-oops-dev/you-oops-dev-repo/releases/tag/stable
+SigLevel = Optional
+Server = https://github.com/you-oops-dev/you-oops-dev-repo/releases/latest/download
 ```
 
 After appending the above lines, it's always a good idea to update everything: `sudo pacman -Syyu`. Now, you should be good to go!

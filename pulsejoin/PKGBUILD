@@ -16,5 +16,5 @@ sha256sums=('SKIP')
 
 package() {
         cd "$srcdir"/$_srcname/
-        make DESTDIR="${pkgdir}/" install
+        make -s DESTDIR="${pkgdir}/" install
 }

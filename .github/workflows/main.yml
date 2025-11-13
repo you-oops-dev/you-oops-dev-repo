@@ -48,8 +48,8 @@ jobs:
 
       - name: Show statistic ccache 1
         run: |
-          sudo ln -s /__w/you-oops-dev.github.io/you-oops-dev.github.io/.ccache /home/build_pkg_container/.ccache
-          sudo chown -R build_pkg_container:users /__w/you-oops-dev.github.io/you-oops-dev.github.io/.ccache/ && sudo ls -la /home/build_pkg_container/.ccache/
+          sudo ln -s /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache /home/build_pkg_container/.ccache
+          sudo chown -R build_pkg_container:users /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache/ && sudo ls -la /home/build_pkg_container/.ccache/
           ccache -vs
 
       - name: Prepare Build Package

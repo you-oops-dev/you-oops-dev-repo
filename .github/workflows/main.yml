@@ -120,7 +120,8 @@ jobs:
         uses: ncipollo/release-action@v1.20.0
         with:
           allowUpdates: true
-          artifactErrorsFailBuild: true
+          artifactErrorsFailBuild: false
+          replacesArtifacts: true
           artifacts: artifact/*
           bodyFile: README.md
           commit: main

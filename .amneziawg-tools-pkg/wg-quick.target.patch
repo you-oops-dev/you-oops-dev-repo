@@ -1,6 +1,0 @@
---- src/amneziawg-tools/src/systemd/wg-quick.target	2024-03-04 17:11:37.350993593 +0300
-+++ wg-quick.target	2024-03-04 17:14:17.475064706 +0300
-@@ -1,2 +1,2 @@
- [Unit]
--Description=WireGuard Tunnels via wg-quick(8)
-+Description=WireGuard Tunnels via awg-quick(8)

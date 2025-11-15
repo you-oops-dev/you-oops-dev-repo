@@ -1,0 +1,35 @@
+# Maintainer: Your Name <youremail@domain.com>
+_COMMIT=116b5b0ecc97cdd609acdd929f4d96c63b003014
+_NAME_ACCOUNT_GITHUB=you-oops-dev
+pkgname=amneziawg-go
+pkgver=1.5
+pkgrel=1
+pkgdesc="VPN amnezia WireGuard Golang userspace implementation"
+arch=('any')
+url="https://github.com/${_NAME_ACCOUNT_GITHUB}/amneziawg-go"
+license=('GPL')
+depends=('bash')
+makedepends=('git' 'go' 'upx')
+options=(!strip)
+source=("${pkgname}::git+${url}.git")
+sha256sums=('SKIP')
+
+prepare(){
+  cd ${srcdir}/${pkgname}
+  git checkout ${_COMMIT}
+  go mod download
+  go mod verify
+}
+
+build() {
+  cd ${srcdir}/${pkgname}
+  #rm -fv ${srcdir}/${pkgname}/go.mod
+  #go mod init amneziawg-go
+  #go mod tidy
+  go build -ldflags "-s -w" -v -o ./${pkgname}-bin
+  upx -q --best --lzma ./${pkgname}-bin 2>/dev/null
+}
+
+package() {
+  install -Dm755 "${srcdir}/${pkgname}/${pkgname}-bin" "${pkgdir}/usr/bin/${pkgname}"
+}

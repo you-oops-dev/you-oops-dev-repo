@@ -1,0 +1,15 @@
+pkgbase = xmm7360-usb-modeswitch
+	pkgdesc = Tools for the Fibocom L850-GL / Intel XMM7360 LTE modem
+	pkgver = 1
+	pkgrel = 1
+	url = https://github.com/xmm7360/xmm7360-usb-modeswitch
+	arch = x86_64
+	license = None
+	makedepends = linux
+	depends = acpi_call
+	depends = mkinitcpio
+	options = !debug
+	source = https://github.com/xmm7360/xmm7360-usb-modeswitch/archive/refs/heads/master.zip
+	sha256sums = 253660ddae6d44a8dd657fb82eeae22eba7aaf27c11eb81f956e193d917dfd5d
+
+pkgname = xmm7360-usb-modeswitch

@@ -1,0 +1,30 @@
+# Maintainer: Dario Ostuni <dario.ostuni@gmail.com>
+
+pkgname=simple-http-server
+pkgver=0.6.13
+pkgrel=1
+pkgdesc="Simple http server in Rust"
+arch=('i686' 'x86_64' 'armv7h' 'aarch64')
+url="https://github.com/TheWaWaR/simple-http-server"
+license=('MIT')
+depends=()
+makedepends=('rust')
+options=('!debug' '!lto')
+
+source=("$pkgname-$pkgver.tar.gz::https://wget.la/$url/archive/refs/tags/v${pkgver}.tar.gz"
+        "vendor.tar.gz")
+
+sha384sums=('f6e54ab9a8aa276277c53b7623a964da81c7526cd14922cec8058cc3af79e774398bfbffc74098416745dc38f8ad485c'
+            '375115a21c9dd3b7b714749408c5f3ba5c45306589cdfa7b0efd236c881de1b461185b3c3d011bccae69f38413d67c1c')
+
+build() {
+    cd "$pkgname-$pkgver" || return 1
+    mkdir -pv .cargo
+    echo -e "[source.crates-io]\nreplace-with = \"vendored-sources\"\n[source.vendored-sources]\ndirectory = \"../vendor\"" > .cargo/config.toml
+    cargo build --release --all-features --locked
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver" || return 1
+    install -Dm755 "target/release/$pkgname" "$pkgdir/usr/bin/$pkgname"
+}

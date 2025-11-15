@@ -1,0 +1,97 @@
+# Maintainer: Antonio Rojas <arojas@archlinux.org>
+# Contributor: Giovanni Scafora <giovanni@archlinux.org>
+# Contributor: Henrik Ronellenfitsch <searinox@web.de>
+# Contributor: Alessio Sergi <sergi.alessio {at} gmail.com>
+# Contributor: Dario 'Dax' Vilardi <dax [at] deelab [dot] org>
+# Contributor: Anatol Pomozov <anatol.pomozov@gmail.com>
+_commit=d6693fb
+_pkgname=amule-${_commit}
+pkgname=amule-daemon
+pkgver=r11121
+pkgrel=2
+pkgdesc='An eMule-like client for ed2k p2p network'
+arch=(x86_64)
+url='http://www.amule.org'
+license=(GPL-2.0-or-later)
+depends=("crypto++" "geoip" "libupnp" "wxwidgets-gtk3" "gd")
+makedepends=("ccache" "wxwidgets-gtk3" "gd")
+options+=('!debug' 'ccache')
+conflicts=('amule')
+
+source=("aMule-SVN-${pkgver}.tar.bz2::https://repo.or.cz/w/amule.git/snapshot/d6693fb.tar.gz"
+        "298.diff"
+        "amuleweb.service"
+        "amuled@.service"
+        "amuled.service"
+        "amule.tmpfiles"
+        "amule-daemon.install"
+        "amule.sysuser")
+sha256sums=('f1371c1915fd01214a80d9aae3c414ecafc2fb40bbdeb1553c541133ce041dc2'
+            '548ad7468888c49ecbbaf47ac745e38ed24c70967d12d5592f6b3d59fbdf01b1'
+            'f50c46605d3ae977913f4dcf0c7405e0bdc84322d1fc877ae851706f0e1ae5fd'
+            'a6bd8616cfc2dd2191a379252d815ace6296cddc993b0ba176cc65bf5a49c2ae'
+            '339d59211bd914dfa43c6c54b68e2715f9648de3220d712c01c004eda19a5b7a'
+            '6af2edd8a1a9cc270f7d79e332e54d84c01e1c0b88f0ee72a13df879facc8df4'
+            '953510be55749027cb773399cd12e5f0c47a2890a8145c5f6b4ec2c9c67a6cc8'
+            'bc870ebde3c5e009605ca76435790ea260a848160db643bf37e4f9de48b5e56c')
+
+install=amule-daemon.install
+
+prepare() {
+  mkdir -pv build
+  cd $_pkgname
+  rm -fr .git
+  patch -p1 -i "${srcdir}/298.diff"
+ cd ../build
+  ../$_pkgname/configure \
+        --prefix=/usr \
+        --enable-nls \
+        --disable-static \
+        --disable-rpath \
+        --with-gnu-ld \
+        --enable-ccache \
+        --disable-debug \
+        --disable-optimize \
+        --disable-profile \
+        --disable-monolithic \
+        --enable-amule-daemon \
+        --enable-amulecmd \
+        --enable-webserver \
+        --disable-amule-gui \
+        --enable-cas \
+        --enable-wxcas \
+        --enable-ed2k \
+        --enable-alc \
+        --enable-alcc \
+        --enable-fileview \
+        --disable-plasmamule \
+        --without-wxdebug \
+        --disable-mmap \
+        --enable-upnp \
+        --enable-geoip \
+        --with-denoise-level=0
+}
+
+build() {
+ cd build
+ make -s
+}
+
+package() {
+ make -s -C build DESTDIR="${pkgdir}" install
+ rm -rf $pkgdir/usr/share/doc
+ rm -f "${pkgdir}/usr/share/amule/skins/"{kde4.zip,gnome.zip}
+ install -Dm755 build/src/utils/fileview/mulefileview "${pkgdir}/usr/bin/mulefileview"
+ install -Dm755 "${_pkgname}/src/utils/scripts/mldonkey_importer.pl" "${pkgdir}/usr/share/amule/mldonkey_importer.pl"
+ install -Dm755 "${_pkgname}/src/utils/scripts/kadnodescreate.pl" "${pkgdir}/usr/share/amule/kadnodescreate.pl"
+ mv "${pkgdir}/usr/share/locale/"{ru,uk} ./
+ rm -rf $pkgdir/usr/share/locale/*
+ mv -f ./{ru,uk} "${pkgdir}/usr/share/locale/"
+ rm -rf ${pkgdir}/usr/share/man/*
+ rm -fr "${pkgdir}/usr/share/"{pixmaps,applications}
+ install -Dm644 "${srcdir}/amuled.service" "${pkgdir}/usr/lib/systemd/system/amuled.service"
+ install -Dm644 "${srcdir}/amuled@.service" "${pkgdir}/usr/lib/systemd/user/amuled.service"
+ install -Dm644 "${srcdir}/amuleweb.service" "${pkgdir}/usr/lib/systemd/system/amuleweb.service"
+ install -Dm644 "${srcdir}/amule.sysuser" "${pkgdir}/usr/lib/sysusers.d/amule.conf"
+ install -Dm644 "${srcdir}/amule.tmpfiles" "${pkgdir}/usr/lib/tmpfiles.d/amule.conf"
+}

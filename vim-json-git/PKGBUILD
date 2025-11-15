@@ -3,7 +3,7 @@
 
 pkgname=vim-json-git
 epoch=1
-pkgver=r94.f5e3181
+pkgver=r102.3727f08
 pkgrel=1
 pkgdesc='Syntax highlighting for JSON, including JSON-specific (non-JS) warnings and quote concealing.'
 arch=('any')
@@ -12,7 +12,7 @@ license=('MIT')
 depends=('vim')
 provides=('vim-json')
 conflicts=('vim-json')
-source=('git://github.com/elzr/vim-json.git')
+source=("git+${url}.git")
 sha256sums=('SKIP')
 
 pkgver() {

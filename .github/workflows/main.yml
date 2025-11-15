@@ -33,7 +33,7 @@ jobs:
 
       - name: Install packages
         run: |
-          pacman -Syyu base base-devel ca-certificates-utils ca-certificates bubblewrap-suid sudo bash git ccache gcc go python-pip curl wget glycin glycin-gtk4 man man-db unzip mc openssh zip htop pacutils pacman-contrib strace bind axel zsh vim namcap debugedit binutils findutils kmod tar --needed --noconfirm
+          pacman -Syyu base base-devel ca-certificates-utils ca-certificates sudo bash git ccache gcc python-pip curl wget unzip openssh zip pacutils pacman-contrib strace bind axel zsh namcap debugedit binutils findutils kmod tar --needed --noconfirm
 
       - name: Prepare Arch Linux container
         run: |
@@ -99,6 +99,16 @@ jobs:
            cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy nano-syntax-highlighting-git --noconfirm --aur
            rm -rf /home/build_pkg_container/.cache/yay/
 
+      - name: Compile package AUR
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+          SHELL: /bin/bash
+        run: |
+           export HOME_GITHUB=$(pwd)
+           cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy opera-proxy-git --noconfirm --aur
+           cp -fv /home/build_pkg_container/.cache/yay/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/
+           rm -rf /home/build_pkg_container/.cache/yay/
+
       - name: Show directory for view compile package
         run: |
            ls -lahs --color=auto /home/build_pkg_container/build/
@@ -109,7 +119,7 @@ jobs:
           SHELL: /bin/bash
         run: |
           export HOME_GITHUB=$(pwd)
-          cd /home/build_pkg_container/build/ && for d in *; do (echo -e "\e[1;34m->\033[0m \e[1;37mEntry into the directory ${d}...\033[0m" && cd "$d"/ && sudo -u build_pkg_container makepkg --config /home/build_pkg_container/build/.makepkg.conf -scCrf --skippgpcheck --noconfirm && echo -e "\e[1;34m->\033[0m \e[1;37mThe package has been assembled ${d}...\033[0m" && echo -e "\n\e[1;34m->\033[0m \e[1;37mCopy package ${d} in directory artifact\033[0m" && sudo cp -fv /home/build_pkg_container/build/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/ && sudo rm -rf ./*.tar.gz ./*.gz ./*.tar.zst ./*.patch ./*.diff ./*.zst ./*.zip ./*.deb ./*.rpm ./*.AppImage ./*.appImage ./*.pkg.tar.xz ./*.tar.zip ./*.tgz ./*.tar.bz2 ./*.tar.gz ./*.bz2 ./*.rar ./*.tar ./*.tbz2 ./pkg/ ./src/ ./*.snap ./*.img ./*.tar.xz ../go/ ../.npm* ../.yarn* ../.cargo/ ../.cache/go* /tmp/* && sudo rm -rfv /home/build_pkg_container/build/${d}/ && sudo pacman -Sc --noconfirm &>/dev/null); done
+          cd /home/build_pkg_container/build/ && for d in *; do (echo -e "\e[1;34m->\033[0m \e[1;37mEntry into the directory ${d}...\033[0m" && cd "$d"/ && sudo -u build_pkg_container makepkg --config /home/build_pkg_container/build/.makepkg.conf -scCrf --skippgpcheck --noconfirm && echo -e "\e[1;34m->\033[0m \e[1;37mThe package has been assembled ${d}...\033[0m" && echo -e "\n\e[1;34m->\033[0m \e[1;37mCopy package ${d} in directory artifact\033[0m" && sudo cp -nfv /home/build_pkg_container/build/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/ && sudo rm -rf ./*.tar.gz ./*.gz ./*.tar.zst ./*.patch ./*.diff ./*.zst ./*.zip ./*.deb ./*.rpm ./*.AppImage ./*.appImage ./*.pkg.tar.xz ./*.tar.zip ./*.tgz ./*.tar.bz2 ./*.tar.gz ./*.bz2 ./*.rar ./*.tar ./*.tbz2 ./pkg/ ./src/ ./*.snap ./*.img ./*.tar.xz ../go/ ../.npm* ../.yarn* ../.cargo/ ../.cache/go* /tmp/* && sudo rm -rf /home/build_pkg_container/build/${d}/ && sudo pacman -Sc --noconfirm &>/dev/null); done
           find /home/build_pkg_container/.cache/yay/ -type f -name '*.pkg.tar.zst' -print0 | xargs -0 -I{} cp -fv -- "{}" ${HOME_GITHUB}/artifact/
           find /home/build_pkg_container/.cache/yay/ -type f -name '*.pkg.tar.xz' -print0 | xargs -0 -I{} cp -fv -- "{}" ${HOME_GITHUB}/artifact/
           sudo rm -rf /home/build_pkg_container/build/ /home/build_pkg_container/.cache/yay/

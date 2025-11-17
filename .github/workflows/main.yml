@@ -86,7 +86,7 @@ jobs:
           sudo pacman -Syy --noconfirm &>/dev/null && sudo pacman -Fyy --noconfirm &>/dev/null
           if [[ $REPO_ENABLE == 1 ]]; then sudo pacman -S cmake3-bin g++9-bin gcc9-bin gfortran9-bin gtk2 libbloom libcork libcorkipset libev qt2 qt3 qt4 shntool split2flac sqlite2 webkitgtk2 --noconfirm --overwrite=/* && sudo pacman -U /home/build_pkg_container/build/deps_build/cpr*.pkg.tar.zst /home/build_pkg_container/build/deps_build/libmaddy*.pkg.tar.zst /home/build_pkg_container/build/deps_build/libmaddylibnick*.pkg.tar.zst --noconfirm --overwrite=/*; else sudo pacman -U /home/build_pkg_container/build/deps_build/*.pkg.tar.zst --noconfirm --overwrite=/*; fi
           sudo rm -fr /home/build_pkg_container/build/deps_build/ /home/build_pkg_container/build/README.md /home/build_pkg_container/build/*gitignore* /home/build_pkg_container/build/you-oops-dev-repo/ /home/build_pkg_container/artifact/ /home/build_pkg_container/build/artifact/
-          sudo cp -fv /home/build_pkg_container/build/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/
+          sudo cp -fv /home/build_pkg_container/build/yay/*.pkg.tar.* ${HOME_GITHUB}/artifact/
           sudo rm -rf /home/build_pkg_container/build/yay/ /home/build_pkg_container/go/ /var/cache/pacman/pkg/*
 
       - name: Compile,install deps with yay AUR

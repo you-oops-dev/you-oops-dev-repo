@@ -107,6 +107,15 @@ jobs:
            cp -fv /home/build_pkg_container/.cache/yay/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/
            rm -rf /home/build_pkg_container/.cache/yay/ /var/cache/pacman/pkg/*
 
+      - name: Copy ready package for Arch in repository
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+          SHELL: /bin/bash
+        run: |
+           export HOME_GITHUB=$(pwd)
+           cp -fv ${HOME_GITHUB}/ready_packages/*.pkg.tar.* ${HOME_GITHUB}/artifact/
+           rm -rf /home/build_pkg_container/ready_packages/ /home/build_pkg_container/build/ready_packages/
+
       - name: Show directory for view compile package
         run: |
            ls -lahs --color=auto /home/build_pkg_container/build/

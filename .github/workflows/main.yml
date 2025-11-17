@@ -1,0 +1,147 @@
+name: CI
+on:
+  workflow_dispatch:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '00 00 * * *'
+
+jobs:
+  prepare:
+   name: Prepare ubuntu
+   runs-on: ubuntu-latest
+   steps:
+      - name: Maximize disk space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 5120
+          remove-dotnet: true
+          remove-android: true
+          remove-docker-images: true
+  build_arch:
+    name: Arch
+    needs: [prepare]
+    runs-on: ubuntu-latest
+
+    container:
+      image: archlinux
+      options: --privileged
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install packages
+        run: |
+          pacman -Syyu base base-devel ca-certificates-utils ca-certificates sudo bash git ccache gcc python-pip curl wget unzip openssh zip pacutils pacman-contrib strace bind axel zsh namcap debugedit binutils findutils kmod tar --needed --noconfirm
+          sudo rm -fv /var/cache/pacman/pkg/*
+
+      - name: Prepare Arch Linux container
+        run: |
+          sudo useradd -m -g users -G log,systemd-journal,wheel,power,daemon -s /bin/bash build_pkg_container
+          echo -e "temp_user\ntemp_user" | sudo passwd build_pkg_container
+          echo "build_pkg_container ALL=(ALL) NOPASSWD:ALL" | sudo tee -ia /etc/sudoers
+
+      - name: Ccache
+        uses: hendrikmuhs/ccache-action@v1.2.19
+        with:
+          create-symlink: true
+
+      - name: Settings ccache
+        run: |
+          sudo rm -rf /root/.ccache/ /home/build_pkg_container/.ccache/
+          sudo ln -sv /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache /home/build_pkg_container/.ccache
+          sudo ln -sv /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache /root/.ccache
+          sudo chown -R build_pkg_container:users /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache/ && sudo ls -la /home/build_pkg_container/.ccache/
+          sudo ccache --set-config=max_size=9000M
+
+      - name: Show statistic ccache 1
+        run: |
+          sudo -u build_pkg_container ccache -vs
+
+      - name: Prepare Build Package
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+          SHELL: /bin/bash
+        run: |
+          export HOME_GITHUB=$(pwd)
+          mkdir -pv ${HOME_GITHUB}/artifact/
+          sudo mkdir -p /home/build_pkg_container/build/
+          sudo cp -f .makepkg.conf /home/build_pkg_container/build/
+          sudo cp -f .makepkg.conf /etc/makepkg.conf
+          sudo cp -f .pacman.conf /etc/pacman.conf
+          sudo rm -r /etc/pacman.d/gnupg/ && sudo pacman-key --init && sudo pacman-key --populate archlinux
+          sudo pacman -Syy --noconfirm &>/dev/null && sudo pacman -Fyy --noconfirm &>/dev/null
+          sudo chown build_pkg_container:users /home/build_pkg_container/build/.makepkg.conf
+          sudo chown root:root /etc/makepkg.conf /etc/pacman.conf
+          cp -rf ./*/ /home/build_pkg_container/build/
+          cd /home/build_pkg_container/
+          sudo chown -R build_pkg_container:users /home/build_pkg_container/
+          cd /home/build_pkg_container/build/
+          sudo -u build_pkg_container git clone https://aur.archlinux.org/yay.git
+          cd yay
+          sudo -u build_pkg_container makepkg --config /home/build_pkg_container/build/.makepkg.conf -scCrfi --skippgpcheck --noconfirm
+          cd ..
+          if [[ $(curl -is -4 -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0' --max-time 30 --retry-delay 2 --retry 3 https://github.com/you-oops-dev/you-oops-dev-repo/releases/latest/download/you-oops-dev-repo.db | head -n 2 | grep -i HTTP | awk '{print $2}') == 200 ]]; then echo -e "\e[1;34m->\033[0m \e[1;37mEnabling repository...\033[0m" && echo -e "\n[you-oops-dev-repo]\nSigLevel = Optional\nServer = https://github.com/you-oops-dev/you-oops-dev-repo/releases/latest/download\nServer = https://github.limoruirui.com/https://github.com/you-oops-dev/you-oops-dev-repo/releases/latest/download\nServer = https://hub.gitmirror.com/https://github.com/you-oops-dev/you-oops-dev-repo/releases/latest/download\n\n[home_you-oops-dev_Arch]\nServer = https://download.opensuse.org/repositories/home:/you-oops-dev/Arch/\$arch" | sudo tee -ai /etc/pacman.conf && curl -4s "https://build.opensuse.org/projects/home:you-oops-dev/signing_keys/download?kind=gpg" > /tmp/home_you-oops-dev_key.gpg && sudo pacman-key --add /tmp/home_you-oops-dev_key.gpg && sudo pacman-key --finger 8f390f892aeafe7d && sudo pacman-key --lsign-key 8f390f892aeafe7d && export REPO_ENABLE=1; else echo -e "\e[1;34m->\033[0m \e[1;37mRepository not enable...\033[0m" && curl -4s "https://build.opensuse.org/projects/home:you-oops-dev/signing_keys/download?kind=gpg" > /tmp/home_you-oops-dev_key.gpg && sudo pacman-key --add /tmp/home_you-oops-dev_key.gpg && sudo pacman-key --finger 8f390f892aeafe7d && sudo pacman-key --lsign-key 8f390f892aeafe7d; fi
+          sudo pacman -Syy --noconfirm &>/dev/null && sudo pacman -Fyy --noconfirm &>/dev/null
+          if [[ $REPO_ENABLE == 1 ]]; then sudo pacman -S cmake3-bin g++9-bin gcc9-bin gfortran9-bin gtk2 libbloom libcork libcorkipset libev qt2 qt3 qt4 shntool split2flac sqlite2 webkitgtk2 --noconfirm --overwrite=/* && sudo pacman -U /home/build_pkg_container/build/deps_build/cpr*.pkg.tar.zst /home/build_pkg_container/build/deps_build/libmaddy*.pkg.tar.zst /home/build_pkg_container/build/deps_build/libmaddylibnick*.pkg.tar.zst --noconfirm --overwrite=/*; else sudo pacman -U /home/build_pkg_container/build/deps_build/*.pkg.tar.zst --noconfirm --overwrite=/*; fi
+          sudo rm -fr /home/build_pkg_container/build/deps_build/ /home/build_pkg_container/build/README.md /home/build_pkg_container/build/*gitignore* /home/build_pkg_container/build/you-oops-dev-repo/ /home/build_pkg_container/artifact/ /home/build_pkg_container/build/artifact/
+          sudo cp -fv /home/build_pkg_container/build/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/
+          sudo rm -rf /home/build_pkg_container/build/yay/ /home/build_pkg_container/go/ /var/cache/pacman/pkg/*
+
+      - name: Compile,install deps with yay AUR
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+          SHELL: /bin/bash
+        run: |
+           cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy nano-syntax-highlighting-git --noconfirm --aur
+           rm -rf /home/build_pkg_container/.cache/yay/ /var/cache/pacman/pkg/*
+
+      - name: Compile package AUR
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+          SHELL: /bin/bash
+        run: |
+           export HOME_GITHUB=$(pwd)
+           cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy zapret-git --noconfirm --aur
+           cp -fv /home/build_pkg_container/.cache/yay/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/
+           rm -rf /home/build_pkg_container/.cache/yay/ /var/cache/pacman/pkg/*
+
+      - name: Show directory for view compile package
+        run: |
+           ls -lahs --color=auto /home/build_pkg_container/build/
+
+      - name: Build Package
+        env:
+          PATH: /usr/lib/ccache/bin:/home/build_pkg_container/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+          SHELL: /bin/bash
+        run: |
+          export HOME_GITHUB=$(pwd)
+          cd /home/build_pkg_container/build/ && for d in *; do (echo -e "\e[1;34m->\033[0m \e[1;37mEntry into the directory ${d}...\033[0m" && cd "$d"/ && sudo -u build_pkg_container makepkg --config /home/build_pkg_container/build/.makepkg.conf -scCrf --skippgpcheck --noconfirm && echo -e "\e[1;34m->\033[0m \e[1;37mThe package has been assembled ${d}...\033[0m" && echo -e "\n\e[1;34m->\033[0m \e[1;37mCopy package ${d} in directory artifact\033[0m" && sudo cp -fv /home/build_pkg_container/build/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/ && sudo rm -rf ./*.tar.gz ./*.gz ./*.tar.zst ./*.patch ./*.diff ./*.zst ./*.zip ./*.deb ./*.rpm ./*.AppImage ./*.appImage ./*.pkg.tar.xz ./*.tar.zip ./*.tgz ./*.tar.bz2 ./*.tar.gz ./*.bz2 ./*.rar ./*.tar ./*.tbz2 ./pkg/ ./src/ ./*.snap ./*.img ./*.tar.xz ../go/ ../.npm* ../.yarn* ../.cargo/ ../.cache/go* /tmp/* && sudo rm -rf /home/build_pkg_container/build/${d}/ /var/cache/pacman/pkg/* && sudo pacman -Sc --noconfirm &>/dev/null); done
+          find /home/build_pkg_container/.cache/yay/ -type f -name '*.pkg.tar.zst' -print0 | xargs -0 -I{} cp -fv -- "{}" ${HOME_GITHUB}/artifact/
+          find /home/build_pkg_container/.cache/yay/ -type f -name '*.pkg.tar.xz' -print0 | xargs -0 -I{} cp -fv -- "{}" ${HOME_GITHUB}/artifact/
+          sudo rm -rf /home/build_pkg_container/build/ /home/build_pkg_container/.cache/yay/
+
+      - name: Show statistic ccache 2
+        run: |
+          sudo -u build_pkg_container ccache -vs
+
+      - name: Generate repo database
+        run: |
+          repo-add --prevent-downgrade ./artifact/you-oops-dev-repo.db.tar.gz $(find ./artifact/ -type f \( -name '*.pkg.tar.zst' -o -name '*.pkg.tar.xz' \))
+          rm -f ./artifact/*.old
+
+      - name: Create/Update GitHub Release
+        uses: ncipollo/release-action@v1.20.0
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: false
+          replacesArtifacts: true
+          removeArtifacts: false
+          artifacts: artifact/*
+          bodyFile: README.md
+          commit: main
+          makeLatest: stable
+          name: stable
+          tag: stable
+          token: ${{ secrets.ACCESS_TOKEN }}

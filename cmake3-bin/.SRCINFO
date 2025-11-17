@@ -1,0 +1,16 @@
+pkgbase = cmake3-bin
+	pkgdesc = A cross-platform open-source make system
+	pkgver = 3.31.6
+	pkgrel = 1
+	url = https://cmake.org
+	arch = x86_64
+	license = custom
+	provides = cmake3
+	conflicts = cmake3
+	options = !strip
+	options = staticlibs
+	options = !debug
+	source = cmake3-bin-3.31.6-x86_64.tar.gz::https://cmake.org/files/v3.31/cmake-3.31.6-linux-x86_64.tar.gz
+	md5sums = 8514fe0197f534eef079097c774c221a
+
+pkgname = cmake3-bin

@@ -34,7 +34,7 @@ jobs:
       - name: Install packages
         run: |
           pacman -Syyu base base-devel ca-certificates-utils ca-certificates sudo bash git ccache gcc python-pip curl wget unzip openssh zip pacutils pacman-contrib strace bind axel zsh namcap debugedit binutils findutils kmod tar --needed --noconfirm
-          sudo rm -fv /var/cache/pacman/pkg/*
+          sudo rm -fr /var/cache/pacman/pkg/*
 
       - name: Prepare Arch Linux container
         run: |

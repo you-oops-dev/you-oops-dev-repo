@@ -2,7 +2,6 @@
 pkgname=vim-molokai-git
 pkgver=r43.db8ce13
 pkgrel=1
-epoch=
 pkgdesc="Port of the TextMate's monokai colorscheme for Vim."
 arch=('any')
 url="https://github.com/tomasr/molokai"

@@ -14,4 +14,3 @@ pkgbase = vim-molokai-git
 	md5sums = SKIP
 
 pkgname = vim-molokai-git
-

@@ -2,7 +2,6 @@
 # Contributor: Jakub Klinkovský <j.l.k@gmx.com>
 
 pkgname=vim-json-git
-epoch=1
 pkgver=r102.3727f08
 pkgrel=1
 pkgdesc='Syntax highlighting for JSON, including JSON-specific (non-JS) warnings and quote concealing.'

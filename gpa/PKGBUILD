@@ -1,0 +1,47 @@
+# Maintainer : David Runge <dave@sleepmap.de>
+# Contributor: speps <speps at aur dot archlinux dot org>
+# Contributor: Mateusz Herych <heniekk@gmail.com>
+# Contributor: Roman Kyrylych <Roman.Kyrylych@gmail.com>
+# Contributor: Ravi Desai <ravster3@hotmail.com>
+
+pkgname=gpa
+pkgver=0.11.0
+pkgrel=1
+pkgdesc="A graphical user interface for the GnuPG"
+arch=('x86_64')
+url="https://www.gnupg.org/related_software/gpa/"
+license=('GPL3')
+depends=('gpgme' 'gtk2')
+source=("https://gnupg.org/ftp/gcrypt/gpa/gpa-${pkgver}.tar.bz2"{,.sig}
+        "0001.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0001-Fix-implicit-declaration-of-gpa_keytable_ensure.patch"
+        "0002.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0002-Remove-trust_item-stuff-to-make-it-build-with-gpgme-.patch"
+        "0003.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0003-Fix-incorrect-callback-arguments.patch")
+
+sha512sums=('976c607732ac5558bc00bfd777408605729155773036ac811faf1e528c29567f9f16288aeaa3390fef7b8eaa75ae68a0fe710f8b55d001580a09d7382d33d20d'
+            'SKIP'
+            '25363c1b2a465cef58e158673a076e0f01fa3657b30d091058793df1c51addf427a967354a659696b5c580ac744641f417369664a1a72941106e901a8f54aace'
+            'e9ac3769d095ef6a65237f7f6d102ae530c912946c204bc957acc4d1a02df66f258b807b2f4ad72aa5f9e1ee4fd914eac8c95de5dac440df6651aec3211cbb43'
+            'bdcb23309ef4bd87856e643b74c778581066c431afc84146e0204f72db35d61a3f70068401cdebfb05b616e48e394fe2a7513865dee5e890befe336f8d4e5591')
+
+validpgpkeys=(D8692123C4065DEA5E0F3AB5249B39D24F25E3B6) # Werner Koch
+
+prepare() {
+  cd "${pkgname}-${pkgver}"
+  patch -p1 -i ../0001.patch
+  patch -p1 -i ../0002.patch
+  patch -p1 -i ../0003.patch
+  autoreconf -vfi
+}
+
+build() {
+  cd "${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+  make DESTDIR="$pkgdir/" install
+  install -vDm 644 {AUTHORS,ChangeLog,NEWS,README,THANKS,TODO} \
+    -t "${pkgdir}/usr/share/doc/${pkgname}"
+}

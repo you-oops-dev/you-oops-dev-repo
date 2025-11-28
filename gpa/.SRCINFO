@@ -1,0 +1,22 @@
+pkgbase = gpa
+	pkgdesc = A graphical user interface for the GnuPG
+	pkgver = 0.11.0
+	pkgrel = 1
+	url = https://www.gnupg.org/related_software/gpa/
+	arch = x86_64
+	license = GPL3
+	depends = gpgme
+	depends = gtk2
+	source = https://gnupg.org/ftp/gcrypt/gpa/gpa-0.11.0.tar.bz2
+	source = https://gnupg.org/ftp/gcrypt/gpa/gpa-0.11.0.tar.bz2.sig
+	source = 0001.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0001-Fix-implicit-declaration-of-gpa_keytable_ensure.patch
+	source = 0002.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0002-Remove-trust_item-stuff-to-make-it-build-with-gpgme-.patch
+	source = 0003.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0003-Fix-incorrect-callback-arguments.patch
+	validpgpkeys = D8692123C4065DEA5E0F3AB5249B39D24F25E3B6
+	sha512sums = 976c607732ac5558bc00bfd777408605729155773036ac811faf1e528c29567f9f16288aeaa3390fef7b8eaa75ae68a0fe710f8b55d001580a09d7382d33d20d
+	sha512sums = SKIP
+	sha512sums = 25363c1b2a465cef58e158673a076e0f01fa3657b30d091058793df1c51addf427a967354a659696b5c580ac744641f417369664a1a72941106e901a8f54aace
+	sha512sums = e9ac3769d095ef6a65237f7f6d102ae530c912946c204bc957acc4d1a02df66f258b807b2f4ad72aa5f9e1ee4fd914eac8c95de5dac440df6651aec3211cbb43
+	sha512sums = bdcb23309ef4bd87856e643b74c778581066c431afc84146e0204f72db35d61a3f70068401cdebfb05b616e48e394fe2a7513865dee5e890befe336f8d4e5591
+
+pkgname = gpa

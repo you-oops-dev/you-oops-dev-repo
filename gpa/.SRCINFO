@@ -8,6 +8,7 @@ pkgbase = gpa
 	makedepends = gpgme
 	makedepends = gtk2
 	makedepends = gtk3
+	makedepends = glib2-devel
 	depends = gpgme
 	depends = gtk2
 	depends = gtk3

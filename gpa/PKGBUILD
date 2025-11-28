@@ -11,7 +11,8 @@ pkgdesc="A graphical user interface for the GnuPG"
 arch=('x86_64')
 url="https://www.gnupg.org/related_software/gpa/"
 license=('GPL3')
-depends=('gpgme' 'gtk2')
+depends=('gpgme' 'gtk2' 'gtk3')
+makedepends=('gpgme' 'gtk2' 'gtk3')
 source=("https://gnupg.org/ftp/gcrypt/gpa/gpa-${pkgver}.tar.bz2"{,.sig}
         "0001.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0001-Fix-implicit-declaration-of-gpa_keytable_ensure.patch"
         "0002.patch::https://gitlab.com/liguros/liguros-repo/-/raw/stable/app-crypt/gpa/files/0.11.0/0002-Remove-trust_item-stuff-to-make-it-build-with-gpgme-.patch"

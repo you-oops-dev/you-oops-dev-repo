@@ -53,7 +53,7 @@ jobs:
           sudo ln -sv /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache /home/build_pkg_container/.ccache
           sudo ln -sv /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache /root/.ccache
           sudo chown -R build_pkg_container:users /__w/you-oops-dev-repo/you-oops-dev-repo/.ccache/ && sudo ls -la /home/build_pkg_container/.ccache/
-          sudo ccache --set-config=max_size=9000M
+          sudo ccache --set-config=max_size=3000M
 
       - name: Show statistic ccache 1
         run: |

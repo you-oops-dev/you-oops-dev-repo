@@ -14,6 +14,7 @@ license=('Freeware')
 depends=('hicolor-icon-theme' 'gtk2' 'gdk-pixbuf2' 'cairo' 'pango' 'sqlite' 'libvorbis' 'libao' 'opus-tools')
 source=("https://www.aimp.ru/files/windows/builds/aimp-nightly-${arch}.pkg.tar.zst")
 sha256sums=('SKIP')
+options=('!strip' 'staticlibs')
 
 package(){
    rm -fr "${srcdir}/usr/share/lintian"
@@ -24,5 +25,6 @@ package(){
    chmod 755 "${pkgdir}/opt/aimp/AIMP"
    chmod 755 "${pkgdir}/opt/aimp/AIMPate"
    chmod 755 "${pkgdir}/opt/aimp/AIMPac"
+   rm -f ./aimp-nightly-*.pkg.tar.zst ./../aimp-nightly-*.pkg.tar.zst
 }
 

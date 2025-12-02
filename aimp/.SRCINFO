@@ -16,6 +16,8 @@ pkgbase = aimp
 	depends = opus-tools
 	provides = aimp
 	conflicts = aimp
+	options = !strip
+	options = staticlibs
 	source = https://www.aimp.ru/files/windows/builds/aimp-nightly-x86_64.pkg.tar.zst
 	sha256sums = SKIP
 

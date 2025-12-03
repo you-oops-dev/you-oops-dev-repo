@@ -17,6 +17,8 @@ pkgbase = paru
 	depends = libalpm.so>=14
 	optdepends = bat: colored pkgbuild printing
 	optdepends = devtools: build in chroot and downloading pkgbuilds
+	options = !debug
+	options = !lto
 	backup = etc/paru.conf
 	source = paru-2.1.0.tar.gz::https://github.com/Morganamilo/paru/archive/v2.1.0.tar.gz
 	sha256sums = eea4dbb524db765d5316f540f9ee670c0bf81aae4827b5417eebb4c9b5651727

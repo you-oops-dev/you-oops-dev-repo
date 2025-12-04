@@ -26,7 +26,7 @@ optdepends=('sing-geosite: sing-geosite database'
 
 backup=("etc/$pkgname/config.json")
 
-_tags=with_gvisor,with_quic,with_wireguard,with_utls,with_reality_server,with_clash_api,with_ech,with_acme,with_dhcp
+_tags=with_gvisor,with_quic,with_dhcp,with_wireguard,with_utls,with_acme,with_clash_api,with_tailscale,with_ccm,badlinkname,tfogo_checklinkname0,with_v2ray_api,with_conntrack,with_grpc
 build(){
     cd "$pkgname-$pkgver" || return 1
 

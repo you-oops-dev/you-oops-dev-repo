@@ -12,7 +12,7 @@ conflicts=('aimp')
 provides=('aimp')
 license=('Freeware')
 depends=('hicolor-icon-theme' 'gtk2' 'gdk-pixbuf2' 'cairo' 'pango' 'sqlite' 'libvorbis' 'libao' 'opus-tools')
-source=("https://www.aimp.ru/files/windows/builds/aimp-nightly-${arch}.pkg.tar.zst")
+source=("https://www.aimp.ru/files/windows/builds/aimp-nightly-${arch[@]}.pkg.tar.zst")
 sha256sums=('SKIP')
 options=('!strip' 'staticlibs')
 

@@ -104,7 +104,6 @@ jobs:
         run: |
            export HOME_GITHUB=$(pwd)
            cd /home/build_pkg_container/build/ && sudo -u build_pkg_container yay -Sy zapret-git --noconfirm --aur
-           cp -fv /home/build_pkg_container/.cache/yay/*/*.pkg.tar.* ${HOME_GITHUB}/artifact/
            rm -rf /home/build_pkg_container/.cache/yay/ /var/cache/pacman/pkg/*
 
       - name: Copy ready package for Arch in repository

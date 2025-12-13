@@ -11,7 +11,7 @@ license=('unknown')
 makedepends=('libffi')
 conflicts=('vlmcsd-git' 'vlmcsd-svn')
 options+=('!debug')
-source=("https://ghproxy.1888866.xyz/https://github.com/Wind4/${pkgname}/archive/refs/tags/svn${pkgver}.tar.gz"
+source=("https://github.com/Wind4/${pkgname}/archive/refs/tags/svn${pkgver}.tar.gz"
         "${pkgname}.service"
         "${pkgname}@.service"
         "${pkgname}.socket")

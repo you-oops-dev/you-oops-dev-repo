@@ -1,6 +1,6 @@
 pkgbase = parabolic
 	pkgdesc = Download web video and audio
-	pkgver = 2025.10.3
+	pkgver = 2025.11.1
 	pkgrel = 1
 	url = https://github.com/NickvisionApps/Parabolic
 	arch = x86_64
@@ -30,7 +30,7 @@ pkgbase = parabolic
 	provides = tube-converter
 	conflicts = tube-converter
 	replaces = tube-converter
-	source = parabolic-2025.10.3.tar.gz::https://github.com/NickvisionApps/Parabolic/archive/refs/tags/2025.10.3.tar.gz
-	sha256sums = 48a412064f020340aa06cffc0bbe5222aaf99e3ebc167623e9d0b54062455fc9
+	source = parabolic-2025.11.1.tar.gz::https://github.com/NickvisionApps/Parabolic/archive/2025.11.1.tar.gz
+	sha256sums = bb70fc5cc1a8b26b493a10af32961424d26ace1a93aed51c6fa316420950fed5
 
 pkgname = parabolic

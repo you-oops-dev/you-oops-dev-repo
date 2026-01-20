@@ -1,14 +1,14 @@
 # Maintainer: Your Name <youremail@domain.com>
 _pkgname=waybar-awg-toggle
 pkgname=waybar-awg-toggle-git
-pkgver=r9.03275e1
-pkgrel=1
+pkgver=r8.edc9953
+pkgrel=2
 pkgdesc="A lightweight, high-performance Waybar plugin written in Rust for managing AmneziaWG (WireGuard protocol with obfuscation) connections."
 arch=('any')
 url="https://github.com/Mat1RX/waybar-awg-toggle"
 license=('none')
 depends=('amneziawg-tools')
-makedepends=('cargo')
+makedepends=('cargo' 'upx')
 optdepends=('amneziawg-dkms: AmneziaWG is a contemporary version of the popular VPN protocol, WireGuard.'
             'amneziawg-go: VPN amnezia WireGuard Golang userspace implementation.')
 options=('!strip')
@@ -25,6 +25,7 @@ pkgver() {
 build() {
 	cd "${srcdir}/${_pkgname}"
 	cargo build --release
+	upx -q --best --lzma "${srcdir}/${_pkgname}/target/release/awg-toggle" 2>/dev/null
 }
 
 package() {

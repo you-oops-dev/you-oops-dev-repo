@@ -31,6 +31,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - uses: MyAlbum/purge-cache@v2
+        with:
+          accessed: true # Purge caches by their last accessed time (default)
+          created: false # Purge caches by their created time (default)
+          max-age: 259200 # Leave only caches accessed in the last 7 days (default)
+          token: ${{ secrets.ACCESS_TOKEN }} # Set a GitHub token
+
       - name: Install packages
         run: |
           pacman -Syyu base base-devel ca-certificates-utils ca-certificates sudo bash git ccache gcc python-pip curl wget unzip openssh zip pacutils pacman-contrib strace bind axel zsh namcap debugedit binutils findutils kmod tar --needed --noconfirm

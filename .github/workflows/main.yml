@@ -35,7 +35,7 @@ jobs:
         with:
           accessed: true # Purge caches by their last accessed time (default)
           created: false # Purge caches by their created time (default)
-          max-age: 259200 # Leave only caches accessed in the last 7 days (default)
+          max-age: 172800 # Leave only caches accessed in the last 7 days (default)
           token: ${{ secrets.ACCESS_TOKEN }} # Set a GitHub token
 
       - name: Install packages

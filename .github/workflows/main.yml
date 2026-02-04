@@ -34,9 +34,10 @@ jobs:
       - uses: MyAlbum/purge-cache@v2
         with:
           accessed: true # Purge caches by their last accessed time (default)
-          created: false # Purge caches by their created time (default)
+          created: true # Purge caches by their created time (default)
           max-age: 172800 # Leave only caches accessed in the last 7 days (default)
           token: ${{ secrets.ACCESS_TOKEN }} # Set a GitHub token
+          debug: true # Set to true to output debug info
 
       - name: Install packages
         run: |

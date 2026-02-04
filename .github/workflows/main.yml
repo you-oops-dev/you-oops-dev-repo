@@ -31,6 +31,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Get Date
+        run: |
+          echo "date=$(date -u "+date-%Y-%m-%d-time-%H-%M-%S")" >> $GITHUB_OUTPUT
+        shell: bash
+
       - uses: MyAlbum/purge-cache@v2
         with:
           accessed: true # Purge caches by their last accessed time (default)

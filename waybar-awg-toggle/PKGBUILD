@@ -2,7 +2,7 @@
 _pkgname=waybar-awg-toggle
 pkgname=waybar-awg-toggle-git
 pkgver=r8.edc9953
-pkgrel=2
+pkgrel=1
 pkgdesc="A lightweight, high-performance Waybar plugin written in Rust for managing AmneziaWG (WireGuard protocol with obfuscation) connections."
 arch=('any')
 url="https://github.com/Mat1RX/waybar-awg-toggle"

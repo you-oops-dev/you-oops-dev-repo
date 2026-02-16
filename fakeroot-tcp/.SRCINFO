@@ -22,6 +22,6 @@ pkgbase = fakeroot-tcp
 	options = !lto
 	options = !debug
 	source = http://ftp.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.37.2.orig.tar.gz
-	sha256sums = 959496928c8a676ec8377f665ff6a19a707bfad693325f9cc4a4126642f53224
+	sha256sums = 0eea60fbe89771b88fcf415c8f2f0a6ccfe9edebbcf3ba5dc0212718d98884db
 
 pkgname = fakeroot-tcp

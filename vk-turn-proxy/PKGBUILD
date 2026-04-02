@@ -1,0 +1,78 @@
+# Maintainer: Your Name <youremail@domain.com>
+
+pkgbase=vk-turn-proxy-git
+pkgname=("${pkgbase}-server" "${pkgbase}-client")
+pkgver=r41.7b8a96e
+pkgrel=1
+arch=('x86_64')
+url="https://github.com/cacggghp/vk-turn-proxy"
+license=('GPL3')
+makedepends=('git' 'go' 'upx')
+#install=
+options=(
+  !debug
+  !strip
+)
+source=("vk-turn-proxy::git+${url}.git"
+        "sysusers-client"
+        "sysusers-server"
+        "vk-turn-proxy-client.service"
+        "vk-turn-proxy-server.service"
+        "vk-turn-proxy-client.env"
+        "vk-turn-proxy-server.env")
+
+sha256sums=('SKIP'
+            '30444c5854ab5ef72d3038407efab76c94cf7a4ce43e64d09c55b1c12a04870d'
+            'bbdf362ca613b705101f5ec86d32b3219669d18a27feb2ad6b3bf31bcf071eec'
+            '06c0d92355ef35eb780dbea7903f8f2981d4f1773f918c85931bb472f837d980'
+            'bc82fb82f3d055098fd57fa18bf7f1047f1e9697ad85358fe28c7bfd7942c934'
+            'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+            '84408f23d69716a5ccc58243acffb0476939bab9b086059c5c7e8f1a503cbd97')
+
+pkgver() {
+	cd vk-turn-proxy
+	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+
+build() {
+  cd vk-turn-proxy
+  mkdir -p build
+  export CGO_CPPFLAGS="${CPPFLAGS}"
+  export CGO_CFLAGS="${CFLAGS}"
+  export CGO_CXXFLAGS="${CXXFLAGS}"
+  export CGO_LDFLAGS="${LDFLAGS}"
+  export GOFLAGS="-buildmode=pie -trimpath -ldflags=-linkmode=external -mod=readonly -modcacherw"
+  go build -o build/vk-turn-proxy-server ./server
+  go build -o build/vk-turn-proxy-client ./client
+  upx -q --best --lzma build/vk-turn-proxy-client 2>/dev/null
+  upx -q --best --lzma build/vk-turn-proxy-server 2>/dev/null
+}
+
+package_vk-turn-proxy-git-server() {
+depends=('glibc')
+pkgdesc="VK TURN Proxy - Server component"
+
+cd vk-turn-proxy
+
+install -Dm755 build/vk-turn-proxy-server "$pkgdir/usr/bin/vk-turn-proxy-server"
+install -Dm644 "$srcdir/"sysusers-server "$pkgdir"/usr/lib/sysusers.d/vk-turn-proxy-git-server.conf
+install -Dm644 "$srcdir/vk-turn-proxy-server.service" "$pkgdir/usr/lib/systemd/system/vk-turn-proxy-server.service"
+install -Dm644 "$srcdir/vk-turn-proxy-server.env" "$pkgdir/etc/default/vk-turn-proxy-server"
+
+}
+
+package_vk-turn-proxy-git-client() {
+depends=('glibc' 'iproute2')
+pkgdesc="VK TURN Proxy - Client component"
+
+cd vk-turn-proxy
+
+install -Dm755 build/vk-turn-proxy-client "$pkgdir/usr/bin/vk-turn-proxy-client"
+install -Dm644 "$srcdir/"sysusers-client "$pkgdir"/usr/lib/sysusers.d/vk-turn-proxy-git-client.conf
+install -Dm644 "$srcdir/vk-turn-proxy-client.service" "$pkgdir/usr/lib/systemd/system/vk-turn-proxy-client.service"
+install -dm755 "$pkgdir/usr/share/vk-turn-proxy"
+install -m644 routes.sh "$pkgdir/usr/share/vk-turn-proxy/routes.sh"
+install -Dm644 "$srcdir/vk-turn-proxy-client.env" "$pkgdir/etc/default/vk-turn-proxy-client"
+
+}

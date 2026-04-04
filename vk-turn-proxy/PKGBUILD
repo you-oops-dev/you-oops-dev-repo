@@ -3,7 +3,7 @@
 pkgbase=vk-turn-proxy-git
 pkgname=("${pkgbase}-server" "${pkgbase}-client")
 pkgver=r41.7b8a96e
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://github.com/cacggghp/vk-turn-proxy"
 license=('GPL3')
@@ -56,7 +56,7 @@ pkgdesc="VK TURN Proxy - Server component"
 cd vk-turn-proxy-git
 
 install -Dm755 build/vk-turn-proxy-server "$pkgdir/usr/bin/vk-turn-proxy-server"
-install -Dm644 "$srcdir/"sysusers-server "$pkgdir"/usr/lib/sysusers.d/vk-turn-proxy-git-server.conf
+install -Dm644 "$srcdir/"sysusers-server "$pkgdir"/usr/lib/sysusers.d/vk-turn-proxy-server.conf
 install -Dm644 "$srcdir/vk-turn-proxy-server.service" "$pkgdir/usr/lib/systemd/system/vk-turn-proxy-server.service"
 install -Dm644 "$srcdir/vk-turn-proxy-server.env" "$pkgdir/etc/default/vk-turn-proxy-server"
 
@@ -69,7 +69,7 @@ pkgdesc="VK TURN Proxy - Client component"
 cd vk-turn-proxy-git
 
 install -Dm755 build/vk-turn-proxy-client "$pkgdir/usr/bin/vk-turn-proxy-client"
-install -Dm644 "$srcdir/"sysusers-client "$pkgdir"/usr/lib/sysusers.d/vk-turn-proxy-git-client.conf
+install -Dm644 "$srcdir/"sysusers-client "$pkgdir"/usr/lib/sysusers.d/vk-turn-proxy-client.conf
 install -Dm644 "$srcdir/vk-turn-proxy-client.service" "$pkgdir/usr/lib/systemd/system/vk-turn-proxy-client.service"
 install -dm755 "$pkgdir/usr/share/vk-turn-proxy"
 install -m644 routes.sh "$pkgdir/usr/share/vk-turn-proxy/routes.sh"

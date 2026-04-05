@@ -13,8 +13,6 @@ options=(
   !debug
   !strip
 )
-backup=(etc/default/vk-turn-proxy-server
-        etc/default/vk-turn-proxy-client)
 
 source=("vk-turn-proxy-git::git+${url}.git"
         "sysusers-client"
@@ -55,6 +53,7 @@ build() {
 package_vk-turn-proxy-git-server() {
 depends=('glibc')
 pkgdesc="VK TURN Proxy - Server component"
+backup=(etc/default/vk-turn-proxy-server)
 
 cd vk-turn-proxy-git
 
@@ -68,6 +67,7 @@ install -Dm644 "$srcdir/vk-turn-proxy-server.env" "$pkgdir/etc/default/vk-turn-p
 package_vk-turn-proxy-git-client() {
 depends=('glibc' 'iproute2')
 pkgdesc="VK TURN Proxy - Client component"
+backup=(etc/default/vk-turn-proxy-client)
 
 cd vk-turn-proxy-git
 

@@ -3,7 +3,7 @@
 pkgbase=vk-turn-proxy-git
 pkgname=("${pkgbase}-server" "${pkgbase}-client")
 pkgver=r41.7b8a96e
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url="https://github.com/cacggghp/vk-turn-proxy"
 license=('GPL3')

@@ -3,13 +3,14 @@
 # Contributor: foutrelis
 # Contributor: Andreas Radke <andyrtr@archlinux.org>
 # Contributor: Chiwan Park <chiwanpark@hotmail.com>
-_pkgname=webkitgtk
+
 pkgname=webkitgtk2
 pkgver=2.4.11
-pkgrel=29
+pkgrel=28
+epoch=3
 pkgdesc="Legacy Web content engine for GTK+ 2"
 arch=("armv7h" "i686" "x86_64")
-url="https://${_pkgname}.org/"
+url="https://${pkgname%2}.org/"
 license=("custom")
 depends=("enchant>=2.2" "geoclue2" "gst-plugins-base-libs" "gtk2" "harfbuzz-icu" "libgl" "libsecret" "libsoup" "libwebp" "libxslt" "libxt")
 optdepends=(
@@ -21,12 +22,11 @@ makedepends=("glib2-devel" "gobject-introspection" "gperf" "gtk3" "mesa" "ruby")
 provides=("libwebkit=${pkgver}")
 conflicts=("libwebkit")
 replaces=("libwebkit")
-options=("!emptydirs" "!lto" "staticlibs")
-options+=("!debug")
-install="${_pkgname}.install"
+options=("!emptydirs" "!lto")
+install="${pkgname%2}.install"
 source=(
-  "https://${_pkgname}.org/releases/${_pkgname}-${pkgver}.tar.xz"
-  "${_pkgname}-2.4.9-abs.patch"
+  "https://${pkgname%2}.org/releases/${pkgname%2}-${pkgver}.tar.xz"
+  "${pkgname%2}-2.4.9-abs.patch"
   "enchant-2.x.patch"
   "icu59.patch"
   "pkgconfig-enchant-2.patch"
@@ -65,8 +65,8 @@ prepare() {
   mkdir -p "${srcdir}/build-gtk2" "${srcdir}/path"
   ln -rTsf "/usr/bin/python2" "${srcdir}/path/python"
 
-  cd "${srcdir}/${_pkgname}-${pkgver}"
-  patch -Np1 -i "${srcdir}/${_pkgname}-2.4.9-abs.patch"
+  cd "${srcdir}/${pkgname%2}-${pkgver}"
+  patch -Np1 -i "${srcdir}/${pkgname%2}-2.4.9-abs.patch"
   patch -Np1 -i "${srcdir}/enchant-2.x.patch"
   patch -Np1 -i "${srcdir}/icu59.patch"
   # https://www.archlinux.org/todo/enchant-221-rebuild/
@@ -108,9 +108,9 @@ build() (
   CFLAGS+=" -Wno-expansion-to-defined -Wno-class-memaccess"
   CXXFLAGS+=" -Wno-expansion-to-defined -Wno-class-memaccess -DUPRV_BLOCK_MACRO_BEGIN=\"\" -DUPRV_BLOCK_MACRO_END=\"\""
 
-  "${srcdir}/${_pkgname}-${pkgver}/configure" \
+  "${srcdir}/${pkgname%2}-${pkgver}/configure" \
     --prefix=/usr \
-    --libexecdir=/usr/lib/${_pkgname} \
+    --libexecdir=/usr/lib/${pkgname} \
     --enable-introspection \
     --with-gtk=2.0 \
     --disable-webkit2
@@ -118,10 +118,10 @@ build() (
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
   sed -i "s/ -shared / -Wl,-O1,--as-needed\0/g" "${srcdir}/build-gtk2/libtool"
 
-  make -s all stamp-po
+  make all stamp-po
 )
 
 package() {
-  make -s -C "${srcdir}/build-gtk2" DESTDIR="${pkgdir}" install
-  install -Dm644 "${srcdir}/${_pkgname}-${pkgver}/Source/WebKit/LICENSE" "${pkgdir}/usr/share/licenses/${_pkgname}/LICENSE"
+  make -C "${srcdir}/build-gtk2" DESTDIR="${pkgdir}" install
+  install -Dm644 "${srcdir}/${pkgname%2}-${pkgver}/Source/WebKit/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }

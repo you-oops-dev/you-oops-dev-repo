@@ -1,0 +1,86 @@
+# Maintainer: asm0dey <pavel.finkelshtein+AUR@gmail.com>
+# Unofficial Maintainer: naruto522ru <The profile (AUR) has all the contacts for communication or write to GitHub>
+# Contributor:: Ilya Basin <basinilya at gmail dot com>
+
+_pkgname=3proxy
+pkgname=3proxy-bin
+pkgver=0.9.7
+pkgrel=1
+pkgdesc="A tiny crossplatform proxy server"
+arch=('any')
+url="http://www.3proxy.ru/"
+license=('BSD')
+depends=('glibc')
+makedepends=('gcc' 'make')
+options=('!lto')
+options+=('!debug' '!strip')
+backup=(etc/3proxy/3proxy.cfg
+        etc/logrotate.d/3proxy)
+conflicts=('3proxy')
+source=("https://github.com/$_pkgname/$_pkgname/releases/download/$pkgver/$_pkgname-$pkgver.x86_64.deb"
+        "$_pkgname.service"
+        "sysusers"
+        "tmpfiles"
+        "logrotate.3proxy")
+
+sha256sums=('5196c4e3f33ccacb6c77ba830c0bc68176076215aa491ed62d5f748c679932d1'
+            'bcaaf2e995dec828cac9cc8c0efe9deab9a369f476b502b2a8ef1e58cb9f4eda'
+            '862161b0e139a0c501b7c1d1941189234018d9730013f3bb23797a7893a098f5'
+            '790126915b39e5838ff77e2f416f3652ca69a380282f60c82a7c2f8eae516094'
+            'bf5933cc2fc13fc5de633d23dad7651188af8e740f03a468f2a86df6dc4d2ef8')
+
+
+package() {
+  cd "$srcdir/"
+  bsdtar -pxf data.tar.zst -C "$pkgdir"
+  mv -f "$pkgdir/bin" "$pkgdir/usr/"
+#Renaming binary
+  cd "$pkgdir/usr/bin/"
+  mv -v 3proxy_crypt mycrypt
+  mv -v 3proxy_ftppr ftppr
+  mv -v 3proxy_pop3p pop3p
+  mv -v 3proxy_smtpp smtpp
+  mv -v 3proxy_socks socks
+  mv -v 3proxy_tcppm tcppm
+  mv -v 3proxy_tlspr tlspr
+  mv -v 3proxy_udppm udppm
+  rm -fv add3proxyuser
+#Renaming man's
+cd "$pkgdir/usr/share/man/man8/"
+mv 3proxy_crypt.8.gz mycrypt.8.gz
+mv 3proxy_ftppr.8.gz ftppr.8.gz
+mv 3proxy_pop3p.8.gz pop3p.8.gz
+mv 3proxy_smtpp.8.gz smtpp.8.gz
+mv 3proxy_socks.8.gz socks.8.gz
+mv 3proxy_tcppm.8.gz tcppm.8.gz
+mv 3proxy_tlspr.8.gz tlspr.8.gz
+mv 3proxy_udppm.8.gz udppm.8.gz
+
+#Fix name binary See ---> https://github.com/BlackArch/blackarch/blob/c950db958b3d3ef212b185e46707838798ca9557/packages/3proxy/PKGBUILD#L40
+  mv "$pkgdir/usr/bin/3proxy_proxy" "$pkgdir/usr/bin/$_pkgname-proxy"
+## Fix conflict with extra/libproxy. See ---> https://github.com/BlackArch/blackarch/blob/4036d65c1e7b554c5d509f966efff8a2e632d231/packages/3proxy/PKGBUILD#L62
+  mv -vf "$pkgdir/usr/share/man/man8/3proxy_proxy.8.gz" \
+    "$pkgdir/usr/share/man/man8/$_pkgname-proxy.8.gz"
+
+  install -dm 755 "$pkgdir/usr/lib/systemd/system/" \
+                  "$pkgdir/usr/lib/$_pkgname" \
+                  "$pkgdir/usr/share/licenses/$_pkgname/" \
+                  "$pkgdir/etc/logrotate.d/"
+  mv "$pkgdir"/usr/local/3proxy/libexec/*.so "$pkgdir"/usr/lib/$_pkgname
+  chmod 755 "$pkgdir"/usr/lib/$_pkgname/*.so
+  rm -r "$pkgdir"/usr/local/ \
+        "$pkgdir"/etc/3proxy/* \
+        "$pkgdir"/etc/init.d/ \
+        "$pkgdir"/var/ \
+	"$pkgdir"/usr/share/doc/
+#Will fix the permissions for us. (see /usr/lib/tmpfiles.d/3proxy.conf)
+  install -d -o root -g root -m 755 "$pkgdir"/var/log/3proxy
+  install -Dm644 "$srcdir/3proxy.service" "$pkgdir/usr/lib/systemd/system/"
+  touch "$pkgdir/etc/$_pkgname/$_pkgname.cfg" && chmod 600 "$pkgdir/etc/$_pkgname/$_pkgname.cfg"
+  install -Dm644 "$srcdir/"sysusers "$pkgdir"/usr/lib/sysusers.d/$_pkgname.conf
+  install -Dm644 "$srcdir/"tmpfiles "$pkgdir"/usr/lib/tmpfiles.d/$_pkgname.conf
+#  install -Dm600 "$srcdir/$pkgname-$pkgver"/cfg/$_pkgname.cfg.sample "$pkgdir/etc/$_pkgname/"
+#  mv "$srcdir/$pkgname-$pkgver/copying" "$pkgdir/usr/share/licenses/$_pkgname/"
+#For logroting log's files
+  install -Dm644 "$srcdir/"logrotate.$_pkgname "$pkgdir"/etc/logrotate.d/$_pkgname
+}

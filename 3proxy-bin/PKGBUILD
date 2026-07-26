@@ -11,7 +11,6 @@ arch=('any')
 url="http://www.3proxy.ru/"
 license=('BSD')
 depends=('glibc')
-makedepends=('gcc' 'make')
 options=('!lto')
 options+=('!debug' '!strip')
 backup=(etc/3proxy/3proxy.cfg

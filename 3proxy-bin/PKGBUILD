@@ -82,4 +82,7 @@ mv 3proxy_udppm.8.gz udppm.8.gz
 #  mv "$srcdir/$pkgname-$pkgver/copying" "$pkgdir/usr/share/licenses/$_pkgname/"
 #For logroting log's files
   install -Dm644 "$srcdir/"logrotate.$_pkgname "$pkgdir"/etc/logrotate.d/$_pkgname
+
+  find "${pkgdir}" -type f -exec chmod 644 {} \;
+  find "${pkgdir}" -type d -exec chmod 755 {} \;
 }

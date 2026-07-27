@@ -1,0 +1,24 @@
+pkgbase = aimp
+	pkgdesc = A powerful free audio player (v6 Alpha, Unstable)
+	pkgver = 6.00.3077
+	pkgrel = 1
+	url = https://www.aimp.ru
+	arch = x86_64
+	license = Freeware
+	depends = hicolor-icon-theme
+	depends = gtk3
+	depends = gdk-pixbuf2
+	depends = cairo
+	depends = pango
+	depends = sqlite
+	depends = libvorbis
+	depends = harfbuzz
+	optdepends = libappindicator: extend app-menu support
+	optdepends = opus-tools: audio codec support
+	noextract = aimp-6.00-3077b-x86_64.pkg.tar.zst
+	options = !strip
+	options = staticlibs
+	source = https://aimp.ru/files/desktop/builds/aimp-6.00-3077b-x86_64.pkg.tar.zst
+	sha256sums = 680e4ddb577bde96cc5c6f164a60bf898e7259dcfe3322d23cb22e34107b21ea
+
+pkgname = aimp
